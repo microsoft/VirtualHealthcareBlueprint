@@ -1,5 +1,4 @@
 
-
 function New-HbsSaaSApplication() 
 {
     param(
@@ -54,35 +53,6 @@ function New-HbsSaaSApplication()
     }
 }
 
-function Get-HbsMarketplaceToken
-{
-    $tenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47"
-    $authority = "https://login.microsoftonline.com/$tenantId/oauth2/token"    
-    $resource = "62d94f6c-d599-489b-a797-3e10e42fbe22"
-    $clientId = "346f6d5e-5aea-4d13-8de4-f1e947f546f9"
-    $clientSecret = Get-Content "marketplace_principle_secret.txt" | ConvertTo-SecureString
-    $tokenResponse = Get-ADALToken -Authority $authority -ClientId $clientId -Resource $resource -ClientSecret $clientSecret
-    return $tokenResponse.AccessToken
-}
-
-function Get-HbsMarketplaceSaaSApplication {
-    param (
-        [Parameter(Mandatory)]
-        [string]
-        $subscriptionId
-    )
-    $token = Get-HbsMarketplaceToken
-    $headers = @{
-        Authorization = "Bearer " + $token
-    }
-
-    $result = Invoke-WebRequest -Uri https://marketplaceapi.microsoft.com/api/saas/subscriptions/$subscriptionId/?api-version=2018-08-31  `
-                                -Method 'get' -Headers $headers `
-                                -ContentType "application/json" 
-    $subscription = ConvertFrom-Json $result.Content
-    return $subscription
-}
-
 function Get-RandomCharacters($length, $characters) { 
     $random = 1..$length | ForEach-Object { Get-Random -Maximum $characters.length } 
     $private:ofs="" 
@@ -96,28 +66,6 @@ function Get-HbsUniqueTenantId {
     $cleanName = ($Name -replace "[^a-zA-Z0-9_-]*", "").ToLower();
     $suffix = Get-RandomCharacters -length 7 -characters 'abcdefghiklmnoprstuvwxyz1234567890' 
     return "$cleanName-$suffix"
-}
-
-function Set-HbsMarketplaceSubscription {
-    param (
-        $subscriptionId,
-        $planId
-    )
-
-    $body = @{
-        planId = $planId
-        quantity = ""
-    } | ConvertTo-Json
-
-    $token = Get-HbsMarketplaceToken
-    $headers = @{
-        Authorization = "Bearer " + $token
-    }
-    Invoke-WebRequest -Uri https://marketplaceapi.microsoft.com/api/saas/subscriptions/$subscriptionId/activate?api-version=2018-08-31 `
-                        -Method "post" `
-                        -ContentType "application/json" `
-                        -Headers $headers `
-                        -Body $body
 }
 
 function New-HbsConvergedApplication {
@@ -150,23 +98,31 @@ function New-HbsBotRegistration {
         $botId,
         $appId,
         $subscriptionId,
-        $resourceGroup
+        $resourceGroup,
+        $planId
     )
     
     $headers = @{
         Authorization = Get-AzBearerToken
     }
 
+    $sku = "F0"
+    $endpoint = "https://bot-api-us.healthbot-$env.microsoft.com/bot/dynabot/$botId"
+    if ($planId -ne "free") {
+        $sku = "S1"
+        $endpoint = "https://bot-api-us.healthbot-$env.microsoft.com/bot-premium/dynabot/$botId"
+    }
+
     $body = @{
             location = "global"
             sku = @{
-                name = "F0"
+                name = $sku
             }
             kind = "bot"
             properties = @{
                 name = $botId
                 displayName = $displayName
-                endpoint = "https://bot-api-us.healthbot-dev.microsoft.com/bot/dynabot/$botId"
+                endpoint = $endpoint
                 msaAppId = $appId
                 enabledChannels = @("webchat", "directline")
                 configuredChannels=  @("webchat", "directline")
@@ -210,7 +166,10 @@ function New-HbsTenant {
         $webchatSecret,
         $saasSubscriptionId,
         $planId,
-        $offerId
+        $offerId,
+        $subscriptionId,
+        $resourceGroup,
+        $location
     )
 
     $body = @{
@@ -224,13 +183,16 @@ function New-HbsTenant {
         saasSubscriptionId = $saasSubscriptionId
         planId = $planId
         offerId = $offerId
+        subscriptionId = $subscriptionId
+        resourceGroup = $resourceGroup
+        location = $location
     } | ConvertTo-Json
 
     $headers = @{
         Authorization = Get-AzBearerToken
     }
 
-    $result = Invoke-WebRequest -Uri http://localhost:8083/api/saas/tenants/?api-version=2019-07-01 `
+    $result = Invoke-WebRequest -Uri $onboardingEndpoint/saas/tenants/?api-version=2019-07-01 `
                       -Method "post" `
                       -ContentType "application/json" `
                       -Headers $headers `
@@ -239,14 +201,6 @@ function New-HbsTenant {
     return $tenant
 }
 
-#New-HbsSaaSApplication -ResourceName "SaaS App-2" -planId free -SubscriptionId dfdf63df-6c7e-44f9-be51-e45ca146ddb8
-#Get-HbsMarketplaceToken
-#Get-HbsMarketplaceSaaSApplication -subscriptionId af1d14b1-f5da-56dd-acf3-29cdb4f16705
-#Set-HbsMarketplaceSubscription -subscriptionId af1d14b1-f5da-56dd-acf3-29cdb4f16705 -planId free
-#New-HbsConvergedApplication -displayName "my app" -password $password
-#$bot = New-HbsBotRegistration -displayName "mybotarie" -botId "mybotarie-123456789" -subscriptionId "dfdf63df-6c7e-44f9-be51-e45ca146ddb8" -resourceGroup "SaaSHealthcareBotsRG" -password $password
-#$webchatSecret = Get-HbsWebchatSecret -resourceId $bot.id
-
 $Name="Arie ## Schwartzman Demo Bot"
 $tenantId = Get-HbsUniqueTenantId -Name $Name
 $resourceGroup = "MarketplaceBot"
@@ -254,6 +208,8 @@ $subscriptionId = "eabec01e-cbfe-4695-9ad8-4211c2495782"
 $planId = "free"
 $offerId = "microsofthealthcarebot"
 $onboardingEndpoint = "http://localhost:8083/api"
+$location = "US"
+$env = "dev"
 
 Try {
     Write-Host "Creating SaaS Marketplace offering $offerId..." -NoNewline
@@ -264,17 +220,20 @@ Try {
     $app = New-HbsConvergedApplication -displayName $tenantId -appSecret $appSecret
     Write-Host "Done" -ForegroundColor Green
     Write-Host "Creating Bot Registration $tenantId..." -NoNewline
-    $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $app.id
+    $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $app.appId -planId $planId
     Write-Host "Done" -ForegroundColor Green
     Write-Host "Getting Webchat secret..." -NoNewline
     $webchatSecret = Get-HbsWebchatSecret -resourceId $bot.id
     Write-Host "Done" -ForegroundColor Green
     $saasSubscriptionId = Split-Path $marketplaceApp.id -Leaf
     Write-Host "Creating HBS Tenant $tenantId..." -NoNewline
-    $tenant = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.id -appSecret $appSecret -webchatSecret $webchatSecret `
+    $saasApplication = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.appId -appSecret $appSecret -webchatSecret $webchatSecret `
                              -saasSubscriptionId $saasSubscriptionId `
-                             -planId $planId -offerId $offerId
-    Write-Host "Done" -ForegroundColor Green    
+                             -planId $planId -offerId $offerId `
+                             -subscriptionId $subscriptionId `
+                             -resourceGRoup $resourceGroup `
+                             -location $location
+    return $saasApplication 
 }
 Catch {
     Write-Host
