@@ -237,11 +237,13 @@ Try {
     Write-Host "Creating LUIS Authoring Account $tenantId-authoring..." -NoNewline
     $luisAuthoring = New-AzCognitiveServicesAccount -ResourceGroupName $resourceGroup -Name $tenantId-authoring `
                      -Type LUIS.Authoring -SkuName "F0" -Location $luisAuthLocation 
+    $luisAuthoringKey = Get-AzCognitiveServicesAccountKey -ResourceGroupName $resourceGroup -Name $tenantId-authoring                
     Write-Host "Done" -ForegroundColor Green
     
     Write-Host "Creating LUIS Authoring Account $tenantId..." -NoNewline
     $luis = New-AzCognitiveServicesAccount -ResourceGroupName $resourceGroup -Name $tenantId `
             -Type LUIS -SkuName "S0" -Location $luisAuthLocation
+    $luisKey = Get-AzCognitiveServicesAccountKey -ResourceGroupName $resourceGroup -Name $tenantId                
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Creating Application Insights $tenantId..." -NoNewline
