@@ -225,16 +225,29 @@ $offerId = "microsofthealthcarebot"
 $onboardingEndpoint = "http://localhost:8083/api"
 $location = "US"
 $ds_location = "East US"
+$luisAuthLocation = "westus"
 $env = "dev"
 
 Try {
     
-    Write-Host
+    Write-Host "Creating/Using ResourceGroup $resourceGroup" -NoNewline
     $rg = New-ResourceGroupIfNeeded -resourceGroup $resourceGroup -location $ds_location    
+    Write-Host "Done" -ForegroundColor Green
+
+    Write-Host "Creating LUIS Authoring Account $tenantId-authoring..." -NoNewline
+    $luisAuthoring = New-AzCognitiveServicesAccount -ResourceGroupName $resourceGroup -Name $tenantId-authoring `
+                     -Type LUIS.Authoring -SkuName "F0" -Location $luisAuthLocation 
+    Write-Host "Done" -ForegroundColor Green
     
+    Write-Host "Creating LUIS Authoring Account $tenantId..." -NoNewline
+    $luis = New-AzCognitiveServicesAccount -ResourceGroupName $resourceGroup -Name $tenantId `
+            -Type LUIS -SkuName "S0" -Location $luisAuthLocation
+    Write-Host "Done" -ForegroundColor Green
+
     Write-Host "Creating Application Insights $tenantId..." -NoNewline
     $appInsights = New-AzApplicationInsights -ResourceGroupName $resourceGroup -Name $tenantId -Location $ds_location
     Write-Host "Done" -ForegroundColor Green
+
 
     Write-Host "Creating SaaS Marketplace offering $offerId..." -NoNewline
     $marketplaceApp = New-HbsSaaSApplication -ResourceName $Name -planId $planId -offerId $offerId -SubscriptionId $subscriptionId
