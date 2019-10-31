@@ -59,6 +59,18 @@ function Get-RandomCharacters($length, $characters) {
     return [String]$characters[$random]
 }
 
+function New-ResourceGroupIfNeeded {
+    param (
+        $resourceGroup,
+        $location
+    )
+    $rg = Get-AzResourceGroup -Name $resourceGroup -ErrorVariable noRg -ErrorAction SilentlyContinue
+    if ($noRg) {
+        $rg = New-AzResourceGroup -Name $resourceGroup -Location $location
+    }    
+    return $rg
+}
+
 function Get-HbsUniqueTenantId {
     param (
         $Name
@@ -169,7 +181,8 @@ function New-HbsTenant {
         $offerId,
         $subscriptionId,
         $resourceGroup,
-        $location
+        $location,
+        $instrumentationKey
     )
 
     $body = @{
@@ -186,6 +199,7 @@ function New-HbsTenant {
         subscriptionId = $subscriptionId
         resourceGroup = $resourceGroup
         location = $location
+        instrumentationKey = $instrumentationKey
     } | ConvertTo-Json
 
     $headers = @{
@@ -203,28 +217,42 @@ function New-HbsTenant {
 
 $Name="Arie ## Schwartzman Demo Bot"
 $tenantId = Get-HbsUniqueTenantId -Name $Name
-$resourceGroup = "MarketplaceBot"
-$subscriptionId = "eabec01e-cbfe-4695-9ad8-4211c2495782"
+$resourceGroup = "Virtual-Assistant-Blueprint"
+$context = Get-AzContext
+$subscriptionId = $context.subscription.id
 $planId = "free"
 $offerId = "microsofthealthcarebot"
 $onboardingEndpoint = "http://localhost:8083/api"
 $location = "US"
+$ds_location = "East US"
 $env = "dev"
 
 Try {
+    
+    Write-Host
+    $rg = New-ResourceGroupIfNeeded -resourceGroup $resourceGroup -location $ds_location    
+    
+    Write-Host "Creating Application Insights $tenantId..." -NoNewline
+    $appInsights = New-AzApplicationInsights -ResourceGroupName $resourceGroup -Name $tenantId -Location $ds_location
+    Write-Host "Done" -ForegroundColor Green
+
     Write-Host "Creating SaaS Marketplace offering $offerId..." -NoNewline
     $marketplaceApp = New-HbsSaaSApplication -ResourceName $Name -planId $planId -offerId $offerId -SubscriptionId $subscriptionId
     Write-Host "Done" -ForegroundColor Green
+
     $appSecret = Get-RandomCharacters -length 30 -characters 'abcdefghiklmnoprstuvwxyz1234567890!"§$%&/()=?}][{@#*+'
     Write-Host "Creating MSA Appliction $tenantId..." -NoNewline
     $app = New-HbsConvergedApplication -displayName $tenantId -appSecret $appSecret
     Write-Host "Done" -ForegroundColor Green
+
     Write-Host "Creating Bot Registration $tenantId..." -NoNewline
     $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $app.appId -planId $planId
     Write-Host "Done" -ForegroundColor Green
+
     Write-Host "Getting Webchat secret..." -NoNewline
     $webchatSecret = Get-HbsWebchatSecret -resourceId $bot.id
     Write-Host "Done" -ForegroundColor Green
+
     $saasSubscriptionId = Split-Path $marketplaceApp.id -Leaf
     Write-Host "Creating HBS Tenant $tenantId..." -NoNewline
     $saasApplication = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.appId -appSecret $appSecret -webchatSecret $webchatSecret `
@@ -232,7 +260,8 @@ Try {
                              -planId $planId -offerId $offerId `
                              -subscriptionId $subscriptionId `
                              -resourceGRoup $resourceGroup `
-                             -location $location
+                             -location $location `
+                             -instrumentationKey $appInsights.InstrumentationKey
     return $saasApplication 
 }
 Catch {
