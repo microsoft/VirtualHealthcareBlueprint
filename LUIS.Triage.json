@@ -1,0 +1,786 @@
+{
+  "luis_schema_version": "2.2.0",
+  "versionId": "0.5",
+  "name": "TriageProd",
+  "desc": "",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "None"
+    },
+    {
+      "name": "Triage"
+    }
+  ],
+  "entities": [
+    {
+      "name": "Gender"
+    },
+    {
+      "name": "Location"
+    },
+    {
+      "name": "Relation"
+    },
+    {
+      "name": "Severity"
+    },
+    {
+      "name": "Symptom"
+    }
+  ],
+  "composites": [],
+  "closedLists": [],
+  "regex_entities": [],
+  "bing_entities": [
+    "age",
+    "datetimeV2"
+  ],
+  "model_features": [
+    {
+      "name": "BodyLocation",
+      "mode": true,
+      "words": "abdomen,abdominal,stomach,belly,tummy,arm,arms,upper extremity,upper extremities,hand,hands,wrist,wrists,finger,fingers,fingernail,fingernails,finger nail,finger nails,elbow,elbows,shoulder,shoulders,leg,legs,lower extremity,lower extremities,foot,feet,heel,heels,ankle,ankles,knee,knees,patellar,hip,hips,toe,toes,toenail,toenails,toe nail,toe nails,back,breast,breasts,chest,chest wall,thoracic,eye,eyes,eyelid,eyelids,eye lid,eye lids,ear,ears,face,facial,lip,lips,mouth,tooth,teeth,gum,gums,tongue,nose,nasal,nare,sinus,throat,head,hair,heart,neck,spine,spinal cord,tailbone,tail bone,skin,pelvis,pelvic,genital,genitals,penis,penile,vagina,vaginal,vulva,vulvar,rectum,rectal,ass hole,asshole,scrotum,scrotal,ass,bottom,behind,butt,buttock,buttocks,pubic,bone,bones,rib,ribs,joint,joints,chin,jaw,forehead,thigh,thighs,kneecap,flank,side,cheek,cheeks,groin,crotch,forearm,forearms,brain,vein,veins,artery,arteries,muscle,muscles,armpit,armpits,underarm,underarms,knuckle,knuckles,shin,shins,calf,calves,foreleg,forelegs,waist,hamstring,lung,lungs,kidney,kidneys,liver,pancreas,spleen,bladder,gallbladder,colon,prostate,cardiac,pulmonary,renal,nerve,nerves,tendon,tendons,ligament,ligaments,ovary,ovaries,ovarian,cervix,womb,uterus,bowel,bowels,intestine,intestines,gut,guts,innards,insides,entrails,scalp,skull,eyeball,eyeballs,retina,retinas,pupil,pupils,iris,eyelash,eyelashes,eyebrow,eyebrows,anus,earlobe",
+      "activated": true
+    },
+    {
+      "name": "Gender",
+      "mode": true,
+      "words": "male,man,boy,boys,gentleman,guy,dude,female,woman,girl,girls,lady,gal",
+      "activated": true
+    },
+    {
+      "name": "Problem",
+      "mode": true,
+      "words": "ache,aches,pain,pains,painful,hurt,hurts,hurting,injury,injuries,injured,trauma,bumped,sick,sickness,feel sick,feeling sick,felt sick,feel ill,feeling ill,felt ill,not feel well,not feeling well,not been feeling well,not felt well,don ' t feel well,dont feel well,didn ' t feel well,didnt feel well,feel bad,feeling bad,felt bad,feel yucky,feeling yucky,felt yucky,feel terrible,feeling terrible,felt terrible,feel horrible,feeling horrible,felt horrible,earache,headache,toothache,stomachache,swelling,swollen,swelled,lump,lumps,fever,feverish,high temperature,body temperature,temperature,febrile,pyrexia,bleeding,bleed,bled,bloody,sore,soreness,killing me,foreign body,something stuck,something is stuck,discharge,drainage,draining,leaking fluid,cloudy fluid,pus,running,runny,pierced,piercing,discomfort,cramp,cramps,cramping,tender,tenderness,spasm,spasms,hives,cough,coughs,coughing,coughing up,sty,sties,styes,hordeolum,chemical in,chemical splash,vomiting,vomitting,vomit,vomited,vomitted,throwing up,throw up,threw up,emesis,sting,stings,stung,choking,choked,lice,crabs,abrasion,abrasions,scratch,scratches,scratched,friction,scrape,tear,torn,cut,laceration,lacerations,lacerated,gash,wound,wounds,wounded,puncture,punctures,punctured,infected,infection,bite,bites,bit,bitten,loss of consciousness,lost consciousness,fainted,passed out,blacked out,burn,burns,burning,burned,burnt,scalded,sunburn,sunburns,sunburned,contraction,contractions,electric shock,electrical shock,epistaxis,nosebleed,overdose,overdosed,poisoning,poison,poisoned,toxicity,toxic,seizure,seizures,seizured,rash,ringworm,high blood pressure,high bp,elevated blood pressure,elevated bp,diarrhea,loose stool,runs,frequent stool,runny stool,watery stool,constipation,constipated,hard stool,impacted stool,impaction,obstipation,itch,itching,itchy,dry,bump,bumps,mass,redness,fatigue,fatigued,feel tired,shortness of breath,cant breathe,can ' t breathe,cannot breathe,can not breathe,cant breath,can ' t breath,cannot breath,can not breath,breathing difficulty,difficult breathing,difficulty breathing,difficult to breathe,difficult to breath,trouble breathing,trouble to breathe,trouble to breath,hard time breathing,hard time to breathe,hard time to breath,sneeze,sneezes,sneezing,dizzy,dizziness,woozy,whoozy,lightheaded,lightheadedness,faint,late period,period is late,period was late,late menstrual period,late monthly period,missed period,missed my period,period is missing,period was missing,missed menstrual period,missed my menstrual period,missed monthly period,missed my monthly period,skipped period,skipped my period,period was skipped,skipped menstrual period,skipped my menstrual period,skipped monthly period,skipped my monthly period,asthma,asthmatic,flare up,flare - up,suicide,suicidal,killing myself,kill myself,morbid,sad,sadness,feeling blue,feel blue,felt blue,depressed,depression,gloomy,melancholy,melancholic,tingling,tingles,numb,numbness,stuffed,stuffy,stuffiness,congested,congestion,purple spots,purple dots,bruise,bruises,bruised,bruising,contusion,contusions,lesion,lesions,mole,moles,blurred vision,blurry vision,altered vision,decreased vision,vision is blurred,vision is blurry,vision is altered,vision is decreased,vision is changed,vision change,loss of vision,vision is lost,cant see,can ' t see,cannot see,can not see,anxiety,anxieties,anxious,nervous,nervousness,feeling tense,feel tense,felt tense,stress,stressed,heart is pounding,heart is racing,heart is beating fast,palpitation,palpitations,skipped beats,skips beats,room is spinning,spinning feeling,spinning sensation,tilting feeling,tilting sensation,vertigo,loose tooth,tooth is loose,tooth feels loose,lost tooth,tooth is lost,tooth lost,blood in urine,blood in my urine,blood colored,blood - colored,color of blood,irritation,irritated,blister,blisters,nausea,nauseous,nauseated,queasy,queazy,queasiness,ringing,tinnitus,hearing noises,decreased hearing,hearing is decreased,diminished hearing,hearing is diminished,hearing loss,loss of hearing,hearing is lost,trouble hearing,cant hear,can ' t hear,cannot hear,can not hear,hearing difficulty,difficulty hearing,difficult to hear,trouble to hear,hard time hearing,hard time to hear,altered hearing,hearing changes,hearing changed,hearing is changed,change in hearing,changes in hearing,changes in my hearing,change in my hearing,deaf,deafness,hearing impaired,impaired hearing,hearing impairment,hearing voices,hoarse,hoarseness,earaches,headaches,toothaches,stomachaches,backache,backaches,shake,shakes,shaking,tremble,trembles,trembling,tremor,wart,warts,cyst,cysts,ulcer,ulcers,heartburn,hypertension,spotting,broke,broken,paining,blocked,plugged,clogged,twist,twisted,sprain,sprains,sprained,strain,strains,strained,fracture,fractures,fractured,pulled,limp,limping,blood in stool,blood in my stool,itches,itched,itchiness,tickle,tickles,tickled,tickling,tingle,tingled,irritating,twitch,twitches,twitched,twitching,quiver,quivers,quivered,quivering,shiver,shivers,shivered,shivering,shudder,shudders,shuddered,suddering,chills,convulsion,convulsing,convulsions,sweat,sweating,sweaty,perspiration,perspiring,tremors,aching,giddy,giddiness,shaky,unsteady,unsteadiness,unstable,light headed,light headedness,wobble,wobbles,wobbled,wobbling,wobbly,jitter,jitters,jittering,jittery,upset,unhappy,distress,rigid,rigidness,stiff,stiffness,paralyzed,paralysis,tired,tiredness,weak,weakness,lethargy,lethargic,exhausted,exhaustion,restless,restlessness,sleepless,sleeplessness,sores,abscess,abscesses,boil,boils,pimple,pimples,furuncle,furuncles,tumor,tumors,memory,forget,forgets,forgetting,remember,remembering,confused,confusion,mental,drip,drips,dripping,watery,watering,leaking,leaky,fall,fell,falling,fallen,tripped,tripping,tumble,tumbled,tumbling,slip,slipped,slipping,appetite,weight,slurred,slurring,snoring,red spots,sniffle,sniffles,sniffling,sniffled,wheeze,wheezing,breathless,short of breath,can't sleep,can not sleep,cannot sleep,cant sleep,sleep problems,no sleep,blood sugar,swallow,swallowing,tearful,frequent urination,frequent peeing,urinate frequently,urinates frequently,pee frequently,pees frequently,urination frequency,peeing freequency,urinary frequency,urinary retention,incontinence,incontinent",
+      "activated": true
+    },
+    {
+      "name": "Relation",
+      "mode": true,
+      "words": "son,grandson,father,dad,daddy,papa,grandfather,granddad,grandad,granddaddy,grandaddy,grandpa,granpa,grampa,gramps,brother,bro,uncle,nephew,husband,fiancé,finace,boyfriend,stepson,stepfather,stepdad,stepdaddy,stepbrother,daughter,granddaughter,mother,mom,mommy,momma,mama,grandmother,grandma,granny,nana,sister,sis,aunt,auntie,niece,wife,fiancée,fiancee,girlfriend,stepdaughter,stepmother,stepmom,stepsister,child,kid,baby,newborn,new born,infant,toddler,sibling,parent,grandparent,relative,cousin,partner,spouse,friend,patient,person,neighbour,neighbor,roommate,room - mate,roomie,colleague,coworker,co - worker,boss",
+      "activated": true
+    },
+    {
+      "name": "Severity",
+      "mode": true,
+      "words": "light,lightly,mild,mildly,severe,severely,terrible,terribly,awful,awfully,bad,badly,horrible,horribly,moderate,moderately,excruciating,excruciatingly,like hell,like crazy,slight,slightly,unbearable,unbearably,serious,seriously,hard",
+      "activated": true
+    }
+  ],
+  "regex_features": [],
+  "utterances": [
+    {
+      "text": "a 57 year old male patient who suffers from headache",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Gender",
+          "startPos": 14,
+          "endPos": 17
+        },
+        {
+          "entity": "Relation",
+          "startPos": 19,
+          "endPos": 25
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 44,
+          "endPos": 51
+        }
+      ]
+    },
+    {
+      "text": "back pain",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 0,
+          "endPos": 3
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 5,
+          "endPos": 8
+        }
+      ]
+    },
+    {
+      "text": "can you help me",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "can you teach me something",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "can you tell me what to do",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "find a cure for me",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "find me a cure",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "he is 6 feet tall",
+      "intent": "None",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 8,
+          "endPos": 11
+        }
+      ]
+    },
+    {
+      "text": "headache",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Symptom",
+          "startPos": 0,
+          "endPos": 7
+        }
+      ]
+    },
+    {
+      "text": "hello",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i am a 29 years old female who suffers from burned skin",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Gender",
+          "startPos": 20,
+          "endPos": 25
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 44,
+          "endPos": 49
+        },
+        {
+          "entity": "Location",
+          "startPos": 51,
+          "endPos": 54
+        }
+      ]
+    },
+    {
+      "text": "i am a 40 year old male with warts",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Gender",
+          "startPos": 19,
+          "endPos": 22
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 29,
+          "endPos": 33
+        }
+      ]
+    },
+    {
+      "text": "i am a male who feels nauseated",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Gender",
+          "startPos": 7,
+          "endPos": 10
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 22,
+          "endPos": 30
+        }
+      ]
+    },
+    {
+      "text": "i feel happy",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i feel like going to the mall",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i feel sick in the last couple of hours",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Symptom",
+          "startPos": 2,
+          "endPos": 10
+        }
+      ]
+    },
+    {
+      "text": "i had lunch with grandma",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i hate my sister",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i have a daughter who has fever",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 9,
+          "endPos": 16
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 26,
+          "endPos": 30
+        }
+      ]
+    },
+    {
+      "text": "i have a female patient who is feeling fatigued",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Gender",
+          "startPos": 9,
+          "endPos": 14
+        },
+        {
+          "entity": "Relation",
+          "startPos": 16,
+          "endPos": 22
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 39,
+          "endPos": 46
+        }
+      ]
+    },
+    {
+      "text": "i have a headache",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Symptom",
+          "startPos": 9,
+          "endPos": 16
+        }
+      ]
+    },
+    {
+      "text": "i have a lot to learn",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i have a patient with hard headaches",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 9,
+          "endPos": 15
+        },
+        {
+          "entity": "Severity",
+          "startPos": 22,
+          "endPos": 25
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 27,
+          "endPos": 35
+        }
+      ]
+    },
+    {
+      "text": "i have a stomach ache",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 9,
+          "endPos": 15
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 17,
+          "endPos": 20
+        }
+      ]
+    },
+    {
+      "text": "i have a stomachache in the last two days",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Symptom",
+          "startPos": 9,
+          "endPos": 19
+        }
+      ]
+    },
+    {
+      "text": "i have an excruciating ear pain",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Severity",
+          "startPos": 10,
+          "endPos": 21
+        },
+        {
+          "entity": "Location",
+          "startPos": 23,
+          "endPos": 25
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 27,
+          "endPos": 30
+        }
+      ]
+    },
+    {
+      "text": "i have nausea",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Symptom",
+          "startPos": 7,
+          "endPos": 12
+        }
+      ]
+    },
+    {
+      "text": "i have pain in my scrotum",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Symptom",
+          "startPos": 7,
+          "endPos": 10
+        },
+        {
+          "entity": "Location",
+          "startPos": 18,
+          "endPos": 24
+        }
+      ]
+    },
+    {
+      "text": "i want to learn more",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i'm head over heels",
+      "intent": "None",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 4,
+          "endPos": 7
+        },
+        {
+          "entity": "Location",
+          "startPos": 14,
+          "endPos": 18
+        }
+      ]
+    },
+    {
+      "text": "i've had a pain in my leg since yesterday",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Symptom",
+          "startPos": 11,
+          "endPos": 14
+        },
+        {
+          "entity": "Location",
+          "startPos": 22,
+          "endPos": 24
+        }
+      ]
+    },
+    {
+      "text": "let's go to eat!",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "my 12 year old son from alabama has diarrhea",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 15,
+          "endPos": 17
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 36,
+          "endPos": 43
+        }
+      ]
+    },
+    {
+      "text": "my 3 month old baby suffers from diarrhea",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 15,
+          "endPos": 18
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 33,
+          "endPos": 40
+        }
+      ]
+    },
+    {
+      "text": "my 35 year old patient is having seizures",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 15,
+          "endPos": 21
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 33,
+          "endPos": 40
+        }
+      ]
+    },
+    {
+      "text": "my baby boy is vomiting",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 6
+        },
+        {
+          "entity": "Gender",
+          "startPos": 8,
+          "endPos": 10
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 15,
+          "endPos": 22
+        }
+      ]
+    },
+    {
+      "text": "my child has fever",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 7
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 13,
+          "endPos": 17
+        }
+      ]
+    },
+    {
+      "text": "my dad is feeling nauseated",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 5
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 18,
+          "endPos": 26
+        }
+      ]
+    },
+    {
+      "text": "my friend hates you",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "my grandma has chest pain",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 9
+        },
+        {
+          "entity": "Location",
+          "startPos": 15,
+          "endPos": 19
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 21,
+          "endPos": 24
+        }
+      ]
+    },
+    {
+      "text": "my grandmother coughs a lot",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 13
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 15,
+          "endPos": 20
+        }
+      ]
+    },
+    {
+      "text": "my grandpa has trouble breathing",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 9
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 15,
+          "endPos": 31
+        }
+      ]
+    },
+    {
+      "text": "my head hurts real bad",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 3,
+          "endPos": 6
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 8,
+          "endPos": 12
+        },
+        {
+          "entity": "Severity",
+          "startPos": 19,
+          "endPos": 21
+        }
+      ]
+    },
+    {
+      "text": "my heart goes out to him",
+      "intent": "None",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 3,
+          "endPos": 7
+        }
+      ]
+    },
+    {
+      "text": "my mom loves cooking duck breast",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "my sister leg hurts",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 8
+        },
+        {
+          "entity": "Location",
+          "startPos": 10,
+          "endPos": 12
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 14,
+          "endPos": 18
+        }
+      ]
+    },
+    {
+      "text": "my son is suffering from a headache",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 5
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 27,
+          "endPos": 34
+        }
+      ]
+    },
+    {
+      "text": "my son suffers from leg soreness",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 3,
+          "endPos": 5
+        },
+        {
+          "entity": "Location",
+          "startPos": 20,
+          "endPos": 22
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 24,
+          "endPos": 31
+        }
+      ]
+    },
+    {
+      "text": "my stomach is cramping",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 3,
+          "endPos": 9
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 14,
+          "endPos": 21
+        }
+      ]
+    },
+    {
+      "text": "please help me",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "sciatic nerve pain symptoms",
+      "intent": "None",
+      "entities": [
+        {
+          "entity": "Symptom",
+          "startPos": 14,
+          "endPos": 17
+        }
+      ]
+    },
+    {
+      "text": "symptoms of ear infection",
+      "intent": "None",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 12,
+          "endPos": 14
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 16,
+          "endPos": 24
+        }
+      ]
+    },
+    {
+      "text": "uncle has stomachache",
+      "intent": "Triage",
+      "entities": [
+        {
+          "entity": "Relation",
+          "startPos": 0,
+          "endPos": 4
+        },
+        {
+          "entity": "Symptom",
+          "startPos": 10,
+          "endPos": 20
+        }
+      ]
+    },
+    {
+      "text": "what is the weather today",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "what is this bot for?",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "what's the meaning of life",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "what's up?",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "yesterday i ate chicken breast",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "you are stupid",
+      "intent": "None",
+      "entities": []
+    }
+  ]
+}
