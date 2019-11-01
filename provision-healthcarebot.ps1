@@ -35,14 +35,14 @@ function New-HbsSaaSApplication() {
 
     if ($result.StatusCode -eq 202) {
         $location = $result.Headers['location'];
-        $r = Invoke-WebRequest -Uri $location -Method 'get' -Headers $headers -ContentType "application/json"
+        $r = Invoke-WebRequest -Uri $location[0] -Method 'get' -Headers $headers -ContentType "application/json"
         if ($null -eq $r) {
             return
         }
         while ($r.StatusCode -ne 200) {
             Write-Host "." -NoNewline
             Start-Sleep -Seconds 1 
-            $r = Invoke-WebRequest -Uri $location -Method 'get' -Headers $headers -ContentType "application/json"
+            $r = Invoke-WebRequest -Uri $location[0] -Method 'get' -Headers $headers -ContentType "application/json"
         }
         $operationStatus = ConvertFrom-Json $r.Content
         if ($operationStatus.properties.status -eq "PendingFulfillmentStart") {
@@ -52,6 +52,36 @@ function New-HbsSaaSApplication() {
             Write-Error "Failed to create" $ResourceName
         }
     }
+}
+
+function Import-LuisApplication($luisJSON, $location, $authKey) {
+
+    $headers = @{
+        "Ocp-Apim-Subscription-Key" = $authKey
+    }
+     
+    $result = Invoke-WebRequest  -Uri "https://$location.api.cognitive.microsoft.com/luis/api/v2.0/apps/import" `
+                       -Method "post" `
+                       -ContentType "application/json" `
+                       -Headers $headers `
+                       -Body $luisJSON
+
+    $luisApplicationResult = ConvertFrom-Json $result.Content    
+    return $luisApplicationResult                     
+}
+
+function Get-LuisApplications($location, $authKey) {
+    $headers = @{
+        "Ocp-Apim-Subscription-Key" = $authKey
+    }
+    $result = Invoke-WebRequest  -Uri "https://$location.api.cognitive.microsoft.com/luis/api/v2.0/apps/?skip=0&take=100" `
+                       -Method "get" `
+                       -ContentType "application/json" `
+                       -Headers $headers
+
+    $luisApplicationResult = ConvertFrom-Json $result.Content    
+    return $luisApplicationResult                     
+
 }
 
 function Get-RandomCharacters($length, $characters) { 
@@ -225,19 +255,20 @@ $planId = "free"
 $offerId = "microsofthealthcarebot"
 $onboardingEndpoint = "http://localhost:8083/api"
 $location = "US"
-$ds_location = "East US"
+$ds_location = "eastus"
 $luisAuthLocation = "westus"
 $env = "dev"
+$luisAppFile = "./LUIS.Triage.json"
 
 Try {
     
-    Write-Host "Creating/Using ResourceGroup $resourceGroup" -NoNewline
+    Write-Host "Creating/Using ResourceGroup $resourceGroup..." -NoNewline
     $rg = New-ResourceGroupIfNeeded -resourceGroup $resourceGroup -location $ds_location    
     Write-Host "Done" -ForegroundColor Green
-
+    
     Write-Host "Creating LUIS Authoring Account $tenantId-authoring..." -NoNewline
     $luisAuthoring = New-AzCognitiveServicesAccount -ResourceGroupName $resourceGroup -Name $tenantId-authoring `
-        -Type LUIS.Authoring -SkuName "F0" -Location $luisAuthLocation 
+                    -Type LUIS.Authoring -SkuName "F0" -Location $luisAuthLocation 
     $luisAuthoringKey = Get-AzCognitiveServicesAccountKey -ResourceGroupName $resourceGroup -Name $tenantId-authoring                
     Write-Host "Done" -ForegroundColor Green
     
@@ -250,7 +281,6 @@ Try {
     Write-Host "Creating Application Insights $tenantId..." -NoNewline
     $appInsights = New-AzApplicationInsights -ResourceGroupName $resourceGroup -Name $tenantId -Location $ds_location
     Write-Host "Done" -ForegroundColor Green
-
 
     Write-Host "Creating SaaS Marketplace offering $offerId..." -NoNewline
     $marketplaceApp = New-HbsSaaSApplication -ResourceName $Name -planId $planId -offerId $offerId -SubscriptionId $subscriptionId
@@ -278,6 +308,12 @@ Try {
         -resourceGRoup $resourceGroup `
         -location $location `
         -instrumentationKey $appInsights.InstrumentationKey
+
+    Write-Host "Importing LUIS Application from $luisAppFile..." -NoNewline
+    $luisJSON = Get-Content -Raw -Path $luisAppFile
+    $luisApplicationId = Import-LuisApplication -luisJSON $luisJSON -location $luisAuthLocation -authKey $luisAuthoringKey.Key1
+    Write-Host "Done" -ForegroundColor Green
+
     return $saasApplication 
 }
 Catch {
