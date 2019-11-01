@@ -1,6 +1,7 @@
 
-function New-HbsSaaSApplication() 
-{
+. ./profile.ps1
+
+function New-HbsSaaSApplication() {
     param(
         $ResourceName,        
         $SubscriptionId,
@@ -15,13 +16,13 @@ function New-HbsSaaSApplication()
     }
     $data = @{
         Properties = @{
-            PublisherId = "microsoft-hcb"
-            OfferId = $offerId
-            SaasResourceName = $ResourceName
-            SKUId = $planId
-            PaymentChannelType = "SubscriptionDelegated"
-            Quantity = 1
-            TermId = "hjdtn7tfnxcy"
+            PublisherId            = "microsoft-hcb"
+            OfferId                = $offerId
+            SaasResourceName       = $ResourceName
+            SKUId                  = $planId
+            PaymentChannelType     = "SubscriptionDelegated"
+            Quantity               = 1
+            TermId                 = "hjdtn7tfnxcy"
             PaymentChannelMetadata = @{
                 AzureSubscriptionId = $SubscriptionId
             }
@@ -29,8 +30,8 @@ function New-HbsSaaSApplication()
     }
     $body = $data | ConvertTo-Json
     $result = Invoke-WebRequest -Uri https://management.azure.com/providers/microsoft.saas/saasresources?api-version=2018-03-01-beta  `
-                                -Method 'put' -Headers $headers `
-                                -Body $body -ContentType "application/json"
+        -Method 'put' -Headers $headers `
+        -Body $body -ContentType "application/json"
 
     if ($result.StatusCode -eq 202) {
         $location = $result.Headers['location'];
@@ -55,7 +56,7 @@ function New-HbsSaaSApplication()
 
 function Get-RandomCharacters($length, $characters) { 
     $random = 1..$length | ForEach-Object { Get-Random -Maximum $characters.length } 
-    $private:ofs="" 
+    $private:ofs = "" 
     return [String]$characters[$random]
 }
 
@@ -92,14 +93,14 @@ function New-HbsConvergedApplication {
 
     $body = @{
         displayName = $displayName
-        password = $appSecret 
+        password    = $appSecret 
     } | ConvertTo-Json
 
     $result = Invoke-WebRequest -Uri $onboardingEndpoint/saas/applications/?api-version=2019-07-01 `
-                      -Method "post" `
-                      -ContentType "application/json" `
-                      -Headers $headers `
-                      -Body $body
+        -Method "post" `
+        -ContentType "application/json" `
+        -Headers $headers `
+        -Body $body
     $applicationsResponse = ConvertFrom-Json $result.Content                      
     return $applicationsResponse   
 }
@@ -126,27 +127,27 @@ function New-HbsBotRegistration {
     }
 
     $body = @{
-            location = "global"
-            sku = @{
-                name = $sku
-            }
-            kind = "bot"
-            properties = @{
-                name = $botId
-                displayName = $displayName
-                endpoint = $endpoint
-                msaAppId = $appId
-                enabledChannels = @("webchat", "directline")
-                configuredChannels=  @("webchat", "directline")
-            }
+        location   = "global"
+        sku        = @{
+            name = $sku
+        }
+        kind       = "bot"
+        properties = @{
+            name               = $botId
+            displayName        = $displayName
+            endpoint           = $endpoint
+            msaAppId           = $appId
+            enabledChannels    = @("webchat", "directline")
+            configuredChannels = @("webchat", "directline")
+        }
     } | ConvertTo-Json
 
     $result = Invoke-WebRequest `
-                -Uri "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.BotService/botServices/$botId/?api-version=2017-12-01" `
-                -Method "put" `
-                -ContentType "application/json" `
-                -Headers $headers `
-                -Body $body 
+        -Uri "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.BotService/botServices/$botId/?api-version=2017-12-01" `
+        -Method "put" `
+        -ContentType "application/json" `
+        -Headers $headers `
+        -Body $body 
     $botRegistration = ConvertFrom-Json $result.Content 
     return $botRegistration
 }
@@ -160,9 +161,9 @@ function Get-HbsWebchatSecret {
     }
 
     $result = Invoke-WebRequest -Uri "https://management.azure.com/$resourceId/channels/WebChatChannel/listChannelWithKeys/?api-version=2017-12-01" `
-                               -Method "post" `
-                               -ContentType "application/json" `
-                               -Headers $headers
+        -Method "post" `
+        -ContentType "application/json" `
+        -Headers $headers
     $botChannel = ConvertFrom-Json $result.Content                
     return $botChannel.properties.properties.sites[0].key
 }
@@ -186,19 +187,19 @@ function New-HbsTenant {
     )
 
     $body = @{
-        name = $tenantId
-        friendly_name = $name
-        app_id = $appId
-        app_secret = $appSecret
-        email = (Get-AzContext).Account.Id
-        webchat_secret = $webchatSecret
-        usermanagement = "portal"
+        name               = $tenantId
+        friendly_name      = $name
+        app_id             = $appId
+        app_secret         = $appSecret
+        email              = (Get-AzContext).Account.Id
+        webchat_secret     = $webchatSecret
+        usermanagement     = "portal"
         saasSubscriptionId = $saasSubscriptionId
-        planId = $planId
-        offerId = $offerId
-        subscriptionId = $subscriptionId
-        resourceGroup = $resourceGroup
-        location = $location
+        planId             = $planId
+        offerId            = $offerId
+        subscriptionId     = $subscriptionId
+        resourceGroup      = $resourceGroup
+        location           = $location
         instrumentationKey = $instrumentationKey
     } | ConvertTo-Json
 
@@ -207,15 +208,15 @@ function New-HbsTenant {
     }
 
     $result = Invoke-WebRequest -Uri $onboardingEndpoint/saas/tenants/?api-version=2019-07-01 `
-                      -Method "post" `
-                      -ContentType "application/json" `
-                      -Headers $headers `
-                      -Body $body
+        -Method "post" `
+        -ContentType "application/json" `
+        -Headers $headers `
+        -Body $body
     $tenant = ConvertFrom-Json $result.Content                
     return $tenant
 }
 
-$Name="Arie ## Schwartzman Demo Bot"
+$Name = "Arie ## Schwartzman Demo Bot"
 $tenantId = Get-HbsUniqueTenantId -Name $Name
 $resourceGroup = "Virtual-Assistant-Blueprint"
 $context = Get-AzContext
@@ -236,13 +237,13 @@ Try {
 
     Write-Host "Creating LUIS Authoring Account $tenantId-authoring..." -NoNewline
     $luisAuthoring = New-AzCognitiveServicesAccount -ResourceGroupName $resourceGroup -Name $tenantId-authoring `
-                     -Type LUIS.Authoring -SkuName "F0" -Location $luisAuthLocation 
+        -Type LUIS.Authoring -SkuName "F0" -Location $luisAuthLocation 
     $luisAuthoringKey = Get-AzCognitiveServicesAccountKey -ResourceGroupName $resourceGroup -Name $tenantId-authoring                
     Write-Host "Done" -ForegroundColor Green
     
     Write-Host "Creating LUIS Authoring Account $tenantId..." -NoNewline
     $luis = New-AzCognitiveServicesAccount -ResourceGroupName $resourceGroup -Name $tenantId `
-            -Type LUIS -SkuName "S0" -Location $luisAuthLocation
+        -Type LUIS -SkuName "S0" -Location $luisAuthLocation
     $luisKey = Get-AzCognitiveServicesAccountKey -ResourceGroupName $resourceGroup -Name $tenantId                
     Write-Host "Done" -ForegroundColor Green
 
@@ -271,12 +272,12 @@ Try {
     $saasSubscriptionId = Split-Path $marketplaceApp.id -Leaf
     Write-Host "Creating HBS Tenant $tenantId..." -NoNewline
     $saasApplication = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.appId -appSecret $appSecret -webchatSecret $webchatSecret `
-                             -saasSubscriptionId $saasSubscriptionId `
-                             -planId $planId -offerId $offerId `
-                             -subscriptionId $subscriptionId `
-                             -resourceGRoup $resourceGroup `
-                             -location $location `
-                             -instrumentationKey $appInsights.InstrumentationKey
+        -saasSubscriptionId $saasSubscriptionId `
+        -planId $planId -offerId $offerId `
+        -subscriptionId $subscriptionId `
+        -resourceGRoup $resourceGroup `
+        -location $location `
+        -instrumentationKey $appInsights.InstrumentationKey
     return $saasApplication 
 }
 Catch {
