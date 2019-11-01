@@ -1,4 +1,15 @@
 
+# Virtual Healthcare Blueprint
+
+## Prerequisites
+* Azure Subscription
+* Powershell
+* Powershell Azure modules
+
+## Running the script
+* Connect-AzAccount
+* Run Script
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
