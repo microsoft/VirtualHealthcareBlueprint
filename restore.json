@@ -1,0 +1,37 @@
+{
+    "scenarios": [
+        {
+            "name": "Agent Login",
+            "scenario_trigger": "agent_login",
+            "description": "",
+            "active": true,
+            "version": 1,
+            "code": {
+                "version": 3,
+                "steps": [
+                    {
+                        "id": "5bd3856a3903-62d73907d08cb8c9-8d7f",
+                        "type": "beginScenario",
+                        "designer": {
+                            "xLocation": 469,
+                            "yLocation": 96
+                        },
+                        "scenario": "/builtin/handoff/teams/agentlogin"
+                    }
+                ],
+                "interrupting": false,
+                "breaking": false,
+                "returningMessage": ""
+            }
+        }
+    ],
+    "dataConnections": [],
+    "authenticationProviders": [],
+    "skills": [],
+    "localization": {
+        "system": [],
+        "custom": []
+    },
+    "files": [],
+    "configuration": {}
+}

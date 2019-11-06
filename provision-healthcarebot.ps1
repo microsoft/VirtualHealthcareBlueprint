@@ -1,6 +1,12 @@
 
 . ./profile.ps1
 
+function Get-RandomCharacters($length, $characters) { 
+    $random = 1..$length | ForEach-Object { Get-Random -Maximum $characters.length } 
+    $private:ofs = "" 
+    return [String]$characters[$random]
+}
+
 function New-HbsSaaSApplication() {
     param(
         $ResourceName,        
@@ -35,14 +41,14 @@ function New-HbsSaaSApplication() {
 
     if ($result.StatusCode -eq 202) {
         $location = $result.Headers['location'];
-        $r = Invoke-WebRequest -Uri $location[0] -Method 'get' -Headers $headers -ContentType "application/json"
+        $r = Invoke-WebRequest -Uri $location -Method 'get' -Headers $headers -ContentType "application/json"
         if ($null -eq $r) {
             return
         }
         while ($r.StatusCode -ne 200) {
             Write-Host "." -NoNewline
             Start-Sleep -Seconds 1 
-            $r = Invoke-WebRequest -Uri $location[0] -Method 'get' -Headers $headers -ContentType "application/json"
+            $r = Invoke-WebRequest -Uri $location -Method 'get' -Headers $headers -ContentType "application/json"
         }
         $operationStatus = ConvertFrom-Json $r.Content
         if ($operationStatus.properties.status -eq "PendingFulfillmentStart") {
@@ -70,6 +76,28 @@ function Import-LuisApplication($luisJSON, $location, $authKey) {
     return $luisApplicationResult                     
 }
 
+function Set-LuisApplicationAccount($appId, $subscriptionId, $resourceGroup, $accountName, $location, $authKey) {
+
+    $headers = @{
+        "Ocp-Apim-Subscription-Key" = $authKey
+        Authorization = Get-AzBearerToken
+    }
+
+    $body = @{
+        azureSubscriptionId = $subscriptionId
+        resourceGroup = $resourceGroup
+        accountName = $accountName
+    } | ConvertTo-Json
+
+    $result = Invoke-WebRequest -Uri "https://$location.api.cognitive.microsoft.com/luis/api/v2.0/apps/$appId/azureaccounts" `
+                            -Method "post" `
+                            -ContentType "application/json" `
+                            -Headers $headers `
+                            -Body $body 
+    $assignResult = ConvertFrom-Json $result.Content    
+    return $assignResult
+}
+
 function Get-LuisApplications($location, $authKey) {
     $headers = @{
         "Ocp-Apim-Subscription-Key" = $authKey
@@ -82,12 +110,6 @@ function Get-LuisApplications($location, $authKey) {
     $luisApplicationResult = ConvertFrom-Json $result.Content    
     return $luisApplicationResult                     
 
-}
-
-function Get-RandomCharacters($length, $characters) { 
-    $random = 1..$length | ForEach-Object { Get-Random -Maximum $characters.length } 
-    $private:ofs = "" 
-    return [String]$characters[$random]
 }
 
 function New-ResourceGroupIfNeeded {
@@ -113,8 +135,7 @@ function Get-HbsUniqueTenantId {
 
 function New-HbsConvergedApplication {
     param (
-        $displayName,
-        $appSecret        
+        $displayName
     )
 
     $headers = @{
@@ -123,7 +144,6 @@ function New-HbsConvergedApplication {
 
     $body = @{
         displayName = $displayName
-        password    = $appSecret 
     } | ConvertTo-Json
 
     $result = Invoke-WebRequest -Uri $onboardingEndpoint/saas/applications/?api-version=2019-07-01 `
@@ -131,7 +151,7 @@ function New-HbsConvergedApplication {
         -ContentType "application/json" `
         -Headers $headers `
         -Body $body
-    $applicationsResponse = ConvertFrom-Json $result.Content                      
+    $applicationsResponse = ConvertFrom-Json $result.Content
     return $applicationsResponse   
 }
 
@@ -246,9 +266,31 @@ function New-HbsTenant {
     return $tenant
 }
 
-$Name = "Arie ## Schwartzman Demo Bot"
+function Restore-HbsTenant($tenant, $location, $data) {
+
+    $body = @{
+        account = $tenant
+        location = $location
+        data = $data | ConvertFrom-Json
+        email = (Get-AzContext).Account.Id
+    } | ConvertTo-Json -Depth 10
+
+    $headers = @{
+        Authorization = Get-AzBearerToken
+    }
+
+    $result = Invoke-WebRequest -Uri $onboardingEndpoint/saas/restore/?api-version=2019-07-01 `
+        -Method "post" `
+        -ContentType "application/json" `
+        -Headers $headers `
+        -Body $body
+    $tenant = ConvertFrom-Json $result.Content                
+    return $tenant
+}
+
+$Name = "VHA-Blueprint"
 $tenantId = Get-HbsUniqueTenantId -Name $Name
-$resourceGroup = "Virtual-Assistant-Blueprint"
+$resourceGroup = "Virtual-Healthcare-Blueprint"
 $context = Get-AzContext
 $subscriptionId = $context.subscription.id
 $planId = "free"
@@ -259,9 +301,12 @@ $ds_location = "eastus"
 $luisAuthLocation = "westus"
 $env = "dev"
 $luisAppFile = "./LUIS.Triage.json"
+$restorePath = "./restore.json"
+$portalEndpoint = "https://us.healthbot-$env.microsoft.com/account"
+
 
 Try {
-    
+
     Write-Host "Creating/Using ResourceGroup $resourceGroup..." -NoNewline
     $rg = New-ResourceGroupIfNeeded -resourceGroup $resourceGroup -location $ds_location    
     Write-Host "Done" -ForegroundColor Green
@@ -272,7 +317,7 @@ Try {
     $luisAuthoringKey = Get-AzCognitiveServicesAccountKey -ResourceGroupName $resourceGroup -Name $tenantId-authoring                
     Write-Host "Done" -ForegroundColor Green
     
-    Write-Host "Creating LUIS Authoring Account $tenantId..." -NoNewline
+    Write-Host "Creating LUIS Prediction Account $tenantId..." -NoNewline
     $luis = New-AzCognitiveServicesAccount -ResourceGroupName $resourceGroup -Name $tenantId `
         -Type LUIS -SkuName "S0" -Location $luisAuthLocation
     $luisKey = Get-AzCognitiveServicesAccountKey -ResourceGroupName $resourceGroup -Name $tenantId                
@@ -286,13 +331,12 @@ Try {
     $marketplaceApp = New-HbsSaaSApplication -ResourceName $Name -planId $planId -offerId $offerId -SubscriptionId $subscriptionId
     Write-Host "Done" -ForegroundColor Green
 
-    $appSecret = Get-RandomCharacters -length 30 -characters 'abcdefghiklmnoprstuvwxyz1234567890!"§$%&/()=?}][{@#*+'
     Write-Host "Creating MSA Appliction $tenantId..." -NoNewline
-    $app = New-HbsConvergedApplication -displayName $tenantId -appSecret $appSecret
+    $app = New-HbsConvergedApplication -displayName $tenantId
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Creating Bot Registration $tenantId..." -NoNewline
-    $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $app.appId -planId $planId
+    $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $app.app.appId -planId $planId
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Getting Webchat secret..." -NoNewline
@@ -301,20 +345,32 @@ Try {
 
     $saasSubscriptionId = Split-Path $marketplaceApp.id -Leaf
     Write-Host "Creating HBS Tenant $tenantId..." -NoNewline
-    $saasApplication = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.appId -appSecret $appSecret -webchatSecret $webchatSecret `
+    $saasTenant = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.app.appId -appSecret $app.creds.secretText -webchatSecret $webchatSecret `
         -saasSubscriptionId $saasSubscriptionId `
         -planId $planId -offerId $offerId `
         -subscriptionId $subscriptionId `
         -resourceGRoup $resourceGroup `
         -location $location `
         -instrumentationKey $appInsights.InstrumentationKey
+    Write-Host "Done" -ForegroundColor Green
+
+    Write-Host "Restoring from backup" -NoNewline
+    $restoreJSON = Get-Content -Raw -Path $restorePath
+    Restore-HbsTenant -location $location -tenant $saasTenant -data $restoreJSON
+    Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Importing LUIS Application from $luisAppFile..." -NoNewline
     $luisJSON = Get-Content -Raw -Path $luisAppFile
     $luisApplicationId = Import-LuisApplication -luisJSON $luisJSON -location $luisAuthLocation -authKey $luisAuthoringKey.Key1
     Write-Host "Done" -ForegroundColor Green
 
-    return $saasApplication 
+    Write-Host "Assigning LUIS app to LUIS account" -NoNewline
+    $assignLuisApp = Set-LuisApplicationAccount -appId $luisApplicationId -subscriptionId $subscriptionId `
+                        -resourceGroup $resourceGroup -accountName $tenantId -location $luisAuthLocation -authKey $luisAuthoringKey.Key1
+    Write-Host "Done" -ForegroundColor Green
+
+    $saasTenant 
+    Write-Host "Your new Healthcare Bot was created: " $portalEndpoint/$tenantId -ForegroundColor Green
 }
 Catch {
     Write-Host
