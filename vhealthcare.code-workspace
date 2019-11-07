@@ -10,5 +10,7 @@
 			"path": "../HealthBOT"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"editor.minimap.enabled": false
+	}
 }
