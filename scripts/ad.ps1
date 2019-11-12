@@ -25,7 +25,6 @@ Function AddResourcePermission($requiredAccess, $exposedPermissions, $requiredAc
     foreach ($permission in $requiredAccesses.Trim().Split(" ")) {
         $reqPermission = $null
         $reqPermission = $exposedPermissions | Where-Object {$_.Value -contains $permission}
-        Write-Host "Collected information for $($reqPermission.Value) of type $permissionType" -ForegroundColor Green
         $resourceAccess = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
         $resourceAccess.Type = $permissionType
         $resourceAccess.Id = $reqPermission.Id    
@@ -45,31 +44,28 @@ Function GetRequiredPermissions($requiredApplicationPermissions, $reqsp) {
     return $requiredAccess
 }
 
-function New-HbsADApplication ($displayName) {    
+function New-HbsADApplication ($displayName, $applicationPermissions) {    
     $pw = ComputePassword
     $fromDate = [System.DateTime]::Now
     $appKey = CreateAppKey -fromDate $fromDate -durationInYears 10 -pw $pw
-    $ApplicationPermissions = "Reports.Read.All"
 
-    Connect-AzureAD
-    $graphsp = Get-AzureADServicePrincipal -SearchString "Microsoft Graph"
-    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-    $microsoftGraphRequiredPermissions = GetRequiredPermissions -reqsp $graphsp -requiredApplicationPermissions $ApplicationPermissions 
-    $requiredResourcesAccess.Add($microsoftGraphRequiredPermissions)
-
+    if ($null -ne $applicationPermissions) {
+        $graphsp = Get-AzureADServicePrincipal -ObjectId "b19d498e-6687-4156-869a-2e8a95a9d659"
+        $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
+        $microsoftGraphRequiredPermissions = GetRequiredPermissions -reqsp $graphsp -requiredApplicationPermissions $applicationPermissions 
+        $requiredResourcesAccess.Add($microsoftGraphRequiredPermissions)
+    }
     
-    Write-Host "Creating the AAD application $displayName..." -NoNewline
     $aadApplication = New-AzureADApplication -DisplayName $displayName `
                       -PasswordCredentials $appKey -AvailableToOtherTenants $true `
-                      -RequiredResourceAccess $requiredResourcesAccess
+                      -RequiredResourceAccess $requiredResourcesAccess 
 
     New-AzureADServicePrincipal -AppId $aadApplication.AppId                      
-    Write-Host "Done" -ForegroundColor Green                       
 
     return @{app = $aadApplication 
              creds=$appKey}
 }
 
-New-HbsADApplication -displayName "Arie Test 3"
+#New-HbsADApplication -displayName "Arie Test 3" -applicationPermissions ("Directory.Read.All", "Group.Read.All","OnlineMeetings.ReadWrite.All")
 
 

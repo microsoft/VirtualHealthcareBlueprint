@@ -3,7 +3,7 @@
         {
             "name": "Agent Login",
             "scenario_trigger": "agent_login",
-            "description": "",
+            "description": "Sets up current logged-in user to be an Agent",
             "active": true,
             "version": 1,
             "code": {
@@ -36,11 +36,11 @@
     "configuration": {
         "handoff": {
             "teams": {
-                "tenantId": "aaa",
-                "groupObjectId": "bbbb",
-                "clientId": "ccc",
-                "clientSecret": "dd",
-                "organizerObjectId": "eeee"
+                "tenantId": "{tenantId}",
+                "groupObjectId": "{groupObjectId}",
+                "clientId": "{clientId}",
+                "clientSecret": "{clientSecret}",
+                "organizerObjectId": "{organizerObjectId}"
             }
         }
     }

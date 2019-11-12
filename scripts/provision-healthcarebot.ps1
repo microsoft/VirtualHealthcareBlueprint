@@ -5,6 +5,7 @@
 . ./luis.ps1
 . ./bot.ps1
 . ./tenant.ps1
+. ./ad.ps1
 
 
 $Name = "VHA-Blueprint"
@@ -50,12 +51,13 @@ Try {
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Creating MSA Appliction $tenantId..." -NoNewline    
-    $app = New-HbsConvergedApplication -displayName $tenantId
+    #$app = New-HbsConvergedApplication -displayName $tenantId
+    $app = New-HbsADApplication -displayName $tenantId
 
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Creating Bot Registration $tenantId..." -NoNewline
-    $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $app.app.appId -planId $planId
+    $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $app.app.AppId -planId $planId
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Getting Webchat secret..." -NoNewline
@@ -64,7 +66,7 @@ Try {
 
     $saasSubscriptionId = Split-Path $marketplaceApp.id -Leaf
     Write-Host "Creating HBS Tenant $tenantId..." -NoNewline
-    $saasTenant = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.app.appId -appSecret $app.creds.secretText -webchatSecret $webchatSecret `
+    $saasTenant = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.app.AppId -appSecret $app.creds.value -webchatSecret $webchatSecret `
         -saasSubscriptionId $saasSubscriptionId `
         -planId $planId -offerId $offerId `
         -subscriptionId $subscriptionId `
@@ -73,20 +75,30 @@ Try {
         -instrumentationKey $appInsights.InstrumentationKey
     Write-Host "Done" -ForegroundColor Green
 
-    Write-Host "Restoring from backup" -NoNewline
-    $restoreJSON = Get-Content -Raw -Path $restorePath
-    Restore-HbsTenant -location $location -tenant $saasTenant -data $restoreJSON
-    Write-Host "Done" -ForegroundColor Green
-
     Write-Host "Importing LUIS Application from $luisAppFile..." -NoNewline
     $luisJSON = Get-Content -Raw -Path $luisAppFile
     $luisApplicationId = Import-LuisApplication -luisJSON $luisJSON -location $luisAuthLocation -authKey $luisAuthoringKey.Key1
     Write-Host "Done" -ForegroundColor Green
 
-    Write-Host "Assigning LUIS app to LUIS account" -NoNewline
+    Write-Host "Assigning LUIS app to LUIS account..." -NoNewline
     $assignLuisApp = Set-LuisApplicationAccount -appId $luisApplicationId -subscriptionId $subscriptionId `
                         -resourceGroup $resourceGroup -accountName $tenantId -location $luisAuthLocation -authKey $luisAuthoringKey.Key1
     Write-Host "Done" -ForegroundColor Green
+
+    Write-Host "Creating MS Graph API Service principle $tenantId-graph-sp..." -NoNewline
+    $spApp = New-HbsADApplication -displayName $tenantId-graph-sp `
+                                  -applicationPermissions "Directory.Read.All Group.Read.All OnlineMeetings.ReadWrite.All"
+    Write-Host "Done" -ForegroundColor Green
+
+    Write-Host "Restoring from backup..." -NoNewline
+    $restoreJSON = Get-Content -Raw -Path $restorePath
+    $restoreJSON = $restoreJSON.Replace("{clientId}", $spApp.app.AppId)
+    $restoreJSON = $restoreJSON.Replace("{clientSecret}", $spApp.creds.Value)
+    $restoreJSON = $restoreJSON.Replace("{tenantId}", (Get-AzureADTenantDetail).ObjectId)
+    $saasTenant = Restore-HbsTenant -location $location -tenant $saasTenant -data $restoreJSON
+    Write-Host "Done" -ForegroundColor Green
+                              
+
 
     $saasTenant 
     Write-Host "Your new Healthcare Bot was created: " $portalEndpoint/$tenantId -ForegroundColor Green
