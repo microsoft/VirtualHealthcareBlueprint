@@ -53,11 +53,12 @@ Try {
     Write-Host "Creating MSA Appliction $tenantId..." -NoNewline    
     #$app = New-HbsConvergedApplication -displayName $tenantId
     $app = New-HbsADApplication -displayName $tenantId
+    $appId = $app.app.AppId
 
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Creating Bot Registration $tenantId..." -NoNewline
-    $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $app.app.AppId -planId $planId
+    $bot = New-HbsBotRegistration -displayName $Name -botId $tenantId -subscriptionId $subscriptionId -resourceGroup $resourceGroup -appId $appId -planId $planId
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Getting Webchat secret..." -NoNewline
@@ -66,7 +67,7 @@ Try {
 
     $saasSubscriptionId = Split-Path $marketplaceApp.id -Leaf
     Write-Host "Creating HBS Tenant $tenantId..." -NoNewline
-    $saasTenant = New-HbsTenant -name $Name -tenantId $tenantId -appId $app.app.AppId -appSecret $app.creds.value -webchatSecret $webchatSecret `
+    $saasTenant = New-HbsTenant -name $Name -tenantId $tenantId -appId $appId -appSecret $app.creds.value -webchatSecret $webchatSecret `
         -saasSubscriptionId $saasSubscriptionId `
         -planId $planId -offerId $offerId `
         -subscriptionId $subscriptionId `
@@ -90,7 +91,7 @@ Try {
                                   -applicationPermissions "Directory.Read.All Group.Read.All OnlineMeetings.ReadWrite.All"
     Write-Host "Done" -ForegroundColor Green
 
-    Write-Host "Restoring from backup..." -NoNewline
+    Write-Host "Importing template from $restorePath..." -NoNewline
     $restoreJSON = Get-Content -Raw -Path $restorePath
     $restoreJSON = $restoreJSON.Replace("{clientId}", $spApp.app.AppId)
     $restoreJSON = $restoreJSON.Replace("{clientSecret}", $spApp.creds.Value)
@@ -98,11 +99,12 @@ Try {
     $saasTenant = Restore-HbsTenant -location $location -tenant $saasTenant -data $restoreJSON
     Write-Host "Done" -ForegroundColor Green
                               
-
-
     $saasTenant 
-    Write-Host "Your new Healthcare Bot was created: " $portalEndpoint/$tenantId -ForegroundColor Green
-    Write-Host "Your new SaaS Application was created: https://ms.portal.azure.com/#@microsoft.onmicrosoft.com/resource/providers/Microsoft.SaaS/saasresources/$saasSubscriptionId/overview" -ForegroundColor Green
+    Write-Host "Your Healthcare Bot is now ready! You can access various resources below:" -ForegroundColor Green
+    Write-Host " - Management Portal: " $portalEndpoint/$tenantId -ForegroundColor Green
+    Write-Host " - Marketplace SaaS Application: https://ms.portal.azure.com/#@/resource/providers/Microsoft.SaaS/saasresources/$saasSubscriptionId/overview" -ForegroundColor Green
+    Write-Host " - Teams Channel Client: https://teams.microsoft.com/l/chat/0/0?users=28:$appId" -ForegroundColor Green
+    Write-Host " - WebChat Client: https://hatenantstorageprod.blob.core.windows.net/public-websites/webchat/index.html?s=$webchatSecret" -ForegroundColor Green
 
 }
 Catch {

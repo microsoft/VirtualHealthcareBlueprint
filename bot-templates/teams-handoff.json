@@ -42,6 +42,22 @@
                 "clientSecret": "{clientSecret}",
                 "organizerObjectId": "{organizerObjectId}"
             }
-        }
+        },
+        "language_understanding": {
+            "custom_regexp_recognizers": {
+                "login": {
+                    "enabled": true,
+                    "description": "Login as an Agent",
+                    "scope": "Top Level Dialog",
+                    "intent": "login",
+                    "expression": "/^login/"
+                }
+            },
+            "intent_handler_map": {
+                "login": {
+                    "handler": "/builtin/handoff/teams/agentlogin"
+                }
+            }
+        }        
     }
 }
