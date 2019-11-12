@@ -33,5 +33,15 @@
         "custom": []
     },
     "files": [],
-    "configuration": {}
+    "configuration": {
+        "handoff": {
+            "teams": {
+                "tenantId": "aaa",
+                "groupObjectId": "bbbb",
+                "clientId": "ccc",
+                "clientSecret": "dd",
+                "organizerObjectId": "eeee"
+            }
+        }
+    }
 }

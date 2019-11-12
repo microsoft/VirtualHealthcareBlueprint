@@ -18,7 +18,7 @@ $location = "US"
 $ds_location = "eastus"
 $luisAuthLocation = "westus"
 $env = "dev"
-$luisAppFile = "../luis/LUIS.Triage.json"
+$luisAppFile = "../lu/LUIS.Triage.json"
 $restorePath = "../bot-templates/teams-handoff.json"
 $portalEndpoint = "https://us.healthbot-$env.microsoft.com/account"
 
@@ -49,8 +49,9 @@ Try {
     $marketplaceApp = New-HbsSaaSApplication -ResourceName $Name -planId $planId -offerId $offerId -SubscriptionId $subscriptionId
     Write-Host "Done" -ForegroundColor Green
 
-    Write-Host "Creating MSA Appliction $tenantId..." -NoNewline
+    Write-Host "Creating MSA Appliction $tenantId..." -NoNewline    
     $app = New-HbsConvergedApplication -displayName $tenantId
+
     Write-Host "Done" -ForegroundColor Green
 
     Write-Host "Creating Bot Registration $tenantId..." -NoNewline
@@ -89,6 +90,8 @@ Try {
 
     $saasTenant 
     Write-Host "Your new Healthcare Bot was created: " $portalEndpoint/$tenantId -ForegroundColor Green
+    Write-Host "Your new SaaS Application was created: https://ms.portal.azure.com/#@microsoft.onmicrosoft.com/resource/providers/Microsoft.SaaS/saasresources/$saasSubscriptionId/overview" -ForegroundColor Green
+
 }
 Catch {
     Write-Host

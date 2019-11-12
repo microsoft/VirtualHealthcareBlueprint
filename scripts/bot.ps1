@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+Generate Converged Application to be used by the Bot Channel Registration
+
+.DESCRIPTION
+Bot Channel Registration requires AD Application to authenticate the bot with the Bot channel connector
+This application is created for this purpose
+
+.PARAMETER displayName
+The friendly name of the application
+
+.EXAMPLE
+New-HbsConvergedApplication -displayName myApplication
+
+#>
+
 function New-HbsConvergedApplication {
     param (
         $displayName
@@ -19,6 +35,38 @@ function New-HbsConvergedApplication {
     $applicationsResponse = ConvertFrom-Json $result.Content
     return $applicationsResponse   
 }
+
+<#
+.SYNOPSIS
+Created Bot Channel Registration ARM resource
+
+.DESCRIPTION
+Long description
+
+.PARAMETER displayName
+Parameter description
+
+.PARAMETER botId
+Parameter description
+
+.PARAMETER appId
+Parameter description
+
+.PARAMETER subscriptionId
+Parameter description
+
+.PARAMETER resourceGroup
+Parameter description
+
+.PARAMETER planId
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
 
 function New-HbsBotRegistration {
     param (
@@ -52,8 +100,8 @@ function New-HbsBotRegistration {
             displayName        = $displayName
             endpoint           = $endpoint
             msaAppId           = $appId
-            enabledChannels    = @("webchat", "directline")
-            configuredChannels = @("webchat", "directline")
+            enabledChannels    = @("webchat", "directline","msteams")
+            configuredChannels = @("webchat", "directline","msteams")
         }
     } | ConvertTo-Json
 
