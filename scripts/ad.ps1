@@ -50,7 +50,8 @@ function New-HbsADApplication ($displayName, $applicationPermissions) {
     $appKey = CreateAppKey -fromDate $fromDate -durationInYears 10 -pw $pw
 
     if ($null -ne $applicationPermissions) {
-        $graphsp = Get-AzureADServicePrincipal -ObjectId "b19d498e-6687-4156-869a-2e8a95a9d659"
+        $graphsp = Get-AzureADServicePrincipal -SearchString "Microsoft Graph"
+        # $graphsp = Get-AzureADServicePrincipal -ObjectId "b19d498e-6687-4156-869a-2e8a95a9d659"
         $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
         $microsoftGraphRequiredPermissions = GetRequiredPermissions -reqsp $graphsp -requiredApplicationPermissions $applicationPermissions 
         $requiredResourcesAccess.Add($microsoftGraphRequiredPermissions)

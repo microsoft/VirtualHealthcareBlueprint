@@ -41,7 +41,8 @@
                 "clientId": "{clientId}",
                 "clientSecret": "{clientSecret}",
                 "organizerObjectId": "{organizerObjectId}"
-            }
+            },
+            "enable": true
         },
         "language_understanding": {
             "custom_regexp_recognizers": {
@@ -51,11 +52,21 @@
                     "scope": "Top Level Dialog",
                     "intent": "login",
                     "expression": "/^login/"
+                },
+                "handoff": {
+                    "enabled": true,
+                    "description": "Handoff to an Agent",
+                    "scope": "Top Level Dialog",
+                    "intent": "handoff",
+                    "expression": "/^handoff/"
                 }
             },
             "intent_handler_map": {
                 "login": {
                     "handler": "/builtin/handoff/teams/agentlogin"
+                },
+                "handoff": {
+                    "handler": "/builtin/handoff"
                 }
             }
         }        
