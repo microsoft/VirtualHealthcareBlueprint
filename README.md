@@ -8,6 +8,7 @@
 
 ## Running the script
 * Connect-AzAccount
+* Connect-AzureAD
 * Run Script
 
 # Contributing

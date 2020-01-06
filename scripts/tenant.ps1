@@ -1,4 +1,5 @@
-$onboardingEndpoint = "https://admin.healthbot-dev.microsoft.com/api"
+#$onboardingEndpoint = "https://admin.healthbot-dev.microsoft.com/api"
+$onboardingEndpoint = "http://localhost:8083/api"
 
 function New-HbsTenant {
     param (
@@ -6,14 +7,9 @@ function New-HbsTenant {
         [string]
         $name,
         $tenantId,
-        $appId,
-        $appSecret,
-        $webchatSecret,
         $saasSubscriptionId,
         $planId,
         $offerId,
-        $subscriptionId,
-        $resourceGroup,
         $location,
         $instrumentationKey
     )
@@ -21,16 +17,11 @@ function New-HbsTenant {
     $body = @{
         name               = $tenantId
         friendly_name      = $name
-        app_id             = $appId
-        app_secret         = $appSecret
         email              = (Get-AzContext).Account.Id
-        webchat_secret     = $webchatSecret
         usermanagement     = "portal"
         saasSubscriptionId = $saasSubscriptionId
         planId             = $planId
         offerId            = $offerId
-        subscriptionId     = $subscriptionId
-        resourceGroup      = $resourceGroup
         location           = $location
         instrumentationKey = $instrumentationKey
     } | ConvertTo-Json
@@ -48,13 +39,13 @@ function New-HbsTenant {
     return $tenant
 }
 
-function Restore-HbsTenant($tenant, $location, $data) {
+function Restore-HbsTenant($tenant, $location, $data, $saasSubscriptionId) {
 
     $body = @{
         account = $tenant
         location = $location
+        saasSubscriptionId = $saasSubscriptionId
         data = $data | ConvertFrom-Json
-        email = (Get-AzContext).Account.Id
     } | ConvertTo-Json -Depth 10
 
     $headers = @{
