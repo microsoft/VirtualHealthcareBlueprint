@@ -1,0 +1,35 @@
+{
+    "scenarios": [
+    ],
+    "authenticationProviders": [],
+    "skills": [],
+    "configuration": {
+        "language_understanding": {
+            "luis_models": {
+                "order_food": {
+                    "application_id": "{luisApplicationId}",
+                    "subscription_key": "{luisPredictionKey}",
+                    "staging": false,
+                    "verbose": true,
+                    "region": "{luisLocation}",
+                    "enabled": true,
+                    "description": "order_food",
+                    "scope": "Top Level Dialog",
+                    "intents": [
+                        "Order Food"
+                    ]
+                }
+            },
+            "intent_handler_map": {
+                "Order Food": {
+                    "handler": "/scenarios/order_food"
+                }
+            }
+        },
+        "environment_variables": {
+            "variables": []
+        }
+    },
+    "localization": {
+    }
+}

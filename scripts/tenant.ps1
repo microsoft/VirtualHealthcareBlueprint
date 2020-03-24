@@ -1,5 +1,5 @@
-#$onboardingEndpoint = "https://admin.healthbot-dev.microsoft.com/api"
-$onboardingEndpoint = "http://localhost:8083/api"
+$onboardingEndpoint = "https://admin.healthbot.microsoft.com/api"
+#$onboardingEndpoint = "http://localhost:8083/api"
 
 function New-HbsTenant {
     param (
@@ -8,8 +8,6 @@ function New-HbsTenant {
         $name,
         $tenantId,
         $saasSubscriptionId,
-        $planId,
-        $offerId,
         $location,
         $instrumentationKey
     )
@@ -20,8 +18,6 @@ function New-HbsTenant {
         email              = (Get-AzContext).Account.Id
         usermanagement     = "portal"
         saasSubscriptionId = $saasSubscriptionId
-        planId             = $planId
-        offerId            = $offerId
         location           = $location
         instrumentationKey = $instrumentationKey
     } | ConvertTo-Json
@@ -30,6 +26,7 @@ function New-HbsTenant {
         Authorization = Get-AzBearerToken
     }
 
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $result = Invoke-WebRequest -Uri $onboardingEndpoint/saas/tenants/?api-version=2019-07-01 `
         -Method "post" `
         -ContentType "application/json" `
