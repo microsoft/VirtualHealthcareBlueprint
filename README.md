@@ -1,5 +1,7 @@
 # Automated Healthcare Bot deployment
 
+![HealthCare bot](./images/logo.png)
+
 ## Overview
 
 This repo will allow you to automate the deployment of Healthcare Bot instance on your own Azure account and linked to your Azure subscription that will also include the LUIS (Language understanding) resources with a [sample LUIS model](./lu/Booking.j) and Application Insights Instrumentation key configured.
