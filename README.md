@@ -1,4 +1,4 @@
-# Creating automated Healthcare Bot deployment
+# Automated Healthcare Bot deployment
 
 ## Overview
 
