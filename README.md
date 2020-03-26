@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repo will allow you to automate the deployment of Healthcare Bot instance on your own Azure account and linked to your Azure subscription that will also include the LUIS (Language understanding) resources with a sample LUIS model and Application Insights Instrumnetation key configured.
+This repo will allow you to automate the deployment of Healthcare Bot instance on your own Azure account and linked to your Azure subscription that will also include the LUIS (Language understanding) resources with a [sample LUIS model](./lu/Booking.j) and Application Insights Instrumentation key configured.
 
 ## Prerequisites
 
@@ -19,18 +19,21 @@ cd VirtualHealthcareBlueprint
 
 ```PowerShell
 Login-AzAccount
-$account = Set-AzContext -Subscription <Your Subscription Name>
+Set-AzContext -Subscription <Your Subscription Name>
 ```
 
 ## Create Healthcare Bot resources
 
-1. Create the Resource Group to contain the supporting resources.
+1. Create the Resource Group that will contain the supporting resources. These will include:
+    * Application Insights
+    * LUIS Authoring account
+    * LUIS Prediction account
 
 ```PowerShell
 $rg = New-AzResourceGroup -Name <service Name> -Location eastus
 ```
 
-2. Assign Healthcare Bot service name
+2. Assign Healthcare Bot service name. This will be used to derive all the other resource names.
 
 ```PowerShell
 $botServiceName = "<healthcare bot service>"
@@ -42,16 +45,20 @@ $botServiceName = "<healthcare bot service>"
 . .\scripts\marketplace.ps1
 ```
 
-4. Create the Healthcare Bot Azure Marketplace SaaS Application.
+4. Create the Healthcare Bot Azure Marketplace SaaS Application. Available plans are:
+
+* free
+* s1 - s5 (paid plans)
 
 ```powershell
 $saasSubscriptionId =  New-HbsSaaSApplication -name $botServiceName -planId free
 ```
 
-4. Deploy Healthcare Bot resources for the Marketplace SaaS application you just created or already had before.
+
+4. Deploy Healthcare Bot resources for the Marketplace SaaS application you just created in previous step. Available locations are US and EU
 
 ```powershell
 .\scripts\azuredeploy-healthcarebot.ps1 -ResourceGroup $rg.ResourceGroupName `
     -saasSubscriptionId $saasSubscriptionId  -serviceName $botServiceName `
-    -botLocation US -matchingParameters $matchingOutput.Outputs
+    -botLocation US
 ```
